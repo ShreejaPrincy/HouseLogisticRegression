@@ -28,7 +28,7 @@ def predict():
     final_input=scalar.transform(np.array(data).reshape(1,-1))
     print(final_input)
     output=regmodell.predict(final_input)[0]
-    return render_template("home.html",prediction_text="Whether you are diabetic or not {}".format(output))
+    return render_template("home.html",prediction_text="median house value for California districts, expressed in hundreds of thousands of dollars ($100,000) is {}".format(output))
 
 
 if __name__=="__main__":

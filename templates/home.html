@@ -1,3 +1,182 @@
-<h1>
-    hello world
-</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>California Housing Price Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>California Housing Price Prediction</h1>
+        
+        <!-- Prediction Form -->
+        <form id="predictForm" method="POST">
+            <div class="form-group">
+                <label for="MedInc">Median Income (MedInc):</label>
+                <input type="number" id="MedInc" name="MedInc" step="any" placeholder="Enter median income" required>
+            </div>
+            <div class="form-group">
+                <label for="HouseAge">House Age (HouseAge):</label>
+                <input type="number" id="HouseAge" name="HouseAge" step="any" placeholder="Enter house age" required>
+            </div>
+            <div class="form-group">
+                <label for="AveRooms">Average Rooms (AveRooms):</label>
+                <input type="number" id="AveRooms" name="AveRooms" step="any" placeholder="Enter average rooms" required>
+            </div>
+            <div class="form-group">
+                <label for="AveBedrms">Average Bedrooms (AveBedrms):</label>
+                <input type="number" id="AveBedrms" name="AveBedrms" step="any" placeholder="Enter average bedrooms" required>
+            </div>
+            <div class="form-group">
+                <label for="Population">Population:</label>
+                <input type="number" id="Population" name="Population" step="any" placeholder="Enter population" required>
+            </div>
+            <div class="form-group">
+                <label for="AveOccup">Average Occupancy (AveOccup):</label>
+                <input type="number" id="AveOccup" name="AveOccup" step="any" placeholder="Enter average occupancy" required>
+            </div>
+            <div class="form-group">
+                <label for="Latitude">Latitude:</label>
+                <input type="number" id="Latitude" name="Latitude" step="any" placeholder="Enter latitude" required>
+            </div>
+            <div class="form-group">
+                <label for="Longitude">Longitude:</label>
+                <input type="number" id="Longitude" name="Longitude" step="any" placeholder="Enter longitude" required>
+            </div>
+            <button type="submit">Predict</button>
+        </form>
+
+        <!-- Prediction Result Section -->
+        <div class="result" id="result">
+            {% if prediction_text %}
+                <p>{{ prediction_text }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Error Message Section -->
+        <div class="error" id="error"></div>
+    </div>
+
+    <script>
+        // Handling form submission via AJAX to avoid page reload
+        document.getElementById('predictForm').addEventListener('submit', function (event) {
+            event.preventDefault();  // Prevent normal form submission
+
+            // Collect input data into an object
+            const data = {
+                MedInc: parseFloat(document.getElementById('MedInc').value),
+                HouseAge: parseFloat(document.getElementById('HouseAge').value),
+                AveRooms: parseFloat(document.getElementById('AveRooms').value),
+                AveBedrms: parseFloat(document.getElementById('AveBedrms').value),
+                Population: parseFloat(document.getElementById('Population').value),
+                AveOccup: parseFloat(document.getElementById('AveOccup').value),
+                Latitude: parseFloat(document.getElementById('Latitude').value),
+                Longitude: parseFloat(document.getElementById('Longitude').value),
+            };
+
+            // Clear previous result and error message
+            document.getElementById('result').textContent = "";
+            document.getElementById('error').textContent = "";
+
+            // Send data to Flask API
+            fetch('/predict_api', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ data: data }),
+            })
+            .then(response => response.json())
+            .then(responseData => {
+                if (responseData.error) {
+                    document.getElementById('error').textContent = 
+                        responseData.error;
+                } else {
+                    // Display prediction result
+                    document.getElementById('result').textContent = 
+                        `Predicted House Price (in $100,000): ${responseData.prediction.toFixed(2)}`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('error').textContent = 
+                    'An error occurred while making the prediction. Please try again.';
+            });
+        });
+    </script>
+
+</body>
+</html>
