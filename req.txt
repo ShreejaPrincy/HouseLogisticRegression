@@ -1,6 +1,6 @@
 Flask 
-scikit-learn
-pandas
-numpy
+scikit-learn==1.5.2
+pandas==2.2.2
+numpy==1.26.4
 matplotlib
 gunicorn
